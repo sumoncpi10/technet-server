@@ -9,7 +9,7 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.euxm4cs.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.o0v1tz1.mongodb.net/?retryWrites=true&w=majority`
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -18,8 +18,8 @@ const client = new MongoClient(uri, {
 
 const run = async () => {
   try {
-    const db = client.db('tech-net');
-    const productCollection = db.collection('product');
+    const db = client.db('technet');
+    const productCollection = db.collection('products');
 
     app.get('/products', async (req, res) => {
       const cursor = productCollection.find({});
@@ -37,9 +37,9 @@ const run = async () => {
     });
 
     app.get('/product/:id', async (req, res) => {
-      const id = req.params.id;
-
-      const result = await productCollection.findOne({ _id: ObjectId(id) });
+      const id = Number(req.params.id);
+      // const id = req.params.id;
+      const result = await productCollection.findOne({ _id:(id) });
       console.log(result);
       res.send(result);
     });
@@ -53,14 +53,14 @@ const run = async () => {
     });
 
     app.post('/comment/:id', async (req, res) => {
-      const productId = req.params.id;
+      const productId = Number(req.params.id);
       const comment = req.body.comment;
 
       console.log(productId);
       console.log(comment);
 
       const result = await productCollection.updateOne(
-        { _id: ObjectId(productId) },
+        { _id: (productId) },
         { $push: { comments: comment } }
       );
 
@@ -77,10 +77,10 @@ const run = async () => {
     });
 
     app.get('/comment/:id', async (req, res) => {
-      const productId = req.params.id;
+      const productId = Number(req.params.id);
 
       const result = await productCollection.findOne(
-        { _id: ObjectId(productId) },
+        { _id: (productId) },
         { projection: { _id: 0, comments: 1 } }
       );
 
@@ -117,7 +117,7 @@ const run = async () => {
 run().catch((err) => console.log(err));
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Hello from Book World!');
 });
 
 app.listen(port, () => {
